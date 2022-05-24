@@ -1,6 +1,8 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include "shader.h"
+#include <stdlib.h>
+#include <time.h>
 
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -19,8 +21,6 @@ void generateLeaf(int, float*&, float*&);
 const unsigned int SCR_WIDTH = 700;
 const unsigned int SCR_HEIGHT = 700;
 const float M_PI = 3.14;
-
-
 
 
 int main()
@@ -50,8 +50,16 @@ int main()
     Shader ourShader("C:/Users/erick/Documents/2022-A/grafica/template/src/Testing/3.3.shader.vs", "C:/Users/erick/Documents/2022-A/grafica/template/src/Testing/3.3.shader.fs");
 
 
-    int num_triangles = 64;
+    // --------------------- triangle - background  -----------------
+    float verticesTriangle[] = 
+    {
+        -1.0f, -1.0f, 0.f,
+        1.0f, -1.0f, 0.f,
+        .0f, 1.0f, 0.f,
+    };
+
     // --------------------- Circle -----------------
+    int num_triangles = 64;
     float* verticesCircle = nullptr;
     float* borderCircle = nullptr;
     generateCicle(num_triangles, verticesCircle, borderCircle);
@@ -61,6 +69,18 @@ int main()
     float* borderLeaf = nullptr;
     generateLeaf(num_triangles, verticesLeaf, borderLeaf);
 
+
+    // --------------------- Triangle - background -----------------
+    unsigned int triangleVBO, triangleVAO;
+    glGenVertexArrays(1, &triangleVAO);
+    glGenBuffers(1, &triangleVBO);
+
+    glBindBuffer(GL_ARRAY_BUFFER, triangleVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(verticesTriangle), verticesTriangle, GL_STATIC_DRAW);
+
+    glBindVertexArray(triangleVAO);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(float), (void*)0);
+    glEnableVertexAttribArray(0);
 
     // --------------------- Circle -----------------
     unsigned int circleVBO, circleVAO;
@@ -111,17 +131,45 @@ int main()
     glEnableVertexAttribArray(0);
 
     glLineWidth(8);
+    srand(time(NULL));
+
+    float* random_colors = new float[17 * 8];
+    for (size_t i = 0; i < 17*8; i++)
+    {
+        random_colors[i] = (rand() % (6)) * 0.1;
+    }
 
     while (!glfwWindowShouldClose(window))
     {
         processInput(window);
 
-        glClearColor(0.6f, 0.6f, 0.6f, 1.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         ourShader.use();
 
+        //------------Triangle - background-----------------
         glm::mat4 trans = glm::mat4(1.0f);
-        trans = glm::scale(trans, glm::vec3(.9, 0.9, 0.9));
+        trans = glm::scale(trans, glm::vec3(.125f, .125f, .125f));
+        trans = glm::translate(trans, glm::vec3(-9, 7, 0.0f));
+        glBindVertexArray(triangleVAO);
+
+        for (size_t i = 0; i < 8; i++)
+        {
+            for (size_t j = 0; j < 17; j++)
+            {
+                trans = glm::translate(trans, glm::vec3(1, 0, 0.0f));
+                trans = glm::scale(trans, glm::vec3(1, -1, 1));
+                ourShader.setMat4("transform", trans);
+                float random_color = random_colors[i * 8 + j];
+                ourShader.setVec4("ourColor", random_color, random_color, random_color, 1.0f);
+                glDrawArrays(GL_TRIANGLES, 0, 3 * num_triangles);
+            }
+            trans = glm::scale(trans, glm::vec3(1, -1, 1));
+            trans = glm::translate(trans, glm::vec3(-17, -2, 0.0f));
+        }
+
+        // new transform matrix
+        trans = glm::mat4(1.0f);
+        trans = glm::scale(trans, glm::vec3(0.85, 0.85, 0.85));
         ourShader.setMat4("transform", trans);
 
         //------------Circle-----------------
@@ -131,6 +179,7 @@ int main()
         ourShader.setVec4("ourColor", 0.f, 0.f, 0.f, 1.0f);
         glBindVertexArray(borderVAO);
         glDrawArrays(GL_LINE_STRIP, 0, 2 * (num_triangles + 8));
+
 
         //------------Leafs green-----------------
         trans = glm::scale(trans, glm::vec3(.6, 0.6, 0.6));
@@ -144,8 +193,8 @@ int main()
             ourShader.setVec4("ourColor", 0.f, 0.f, 0.f, 1.0f);
             glBindVertexArray(borderLeafVAO);
             glDrawArrays(GL_LINE_STRIP, 0, 2 * num_triangles);
-
         }
+
         glBindVertexArray(circleVAO);
         ourShader.setVec4("ourColor", 0.19f, 0.44f, 0.07f, 1.0f);
         trans = glm::scale(trans, glm::vec3(1.15f, 1.15f, 1.15f));
@@ -272,6 +321,8 @@ int main()
         glfwSwapBuffers(window);
         glfwPollEvents();
     }
+    glDeleteVertexArrays(1, &triangleVAO);
+    glDeleteBuffers(1, &triangleVBO);
 
     glDeleteVertexArrays(1, &circleVAO);
     glDeleteBuffers(1, &circleVBO);
@@ -287,6 +338,7 @@ int main()
     delete[] verticesLeaf;
     delete[] borderCircle;
     delete[] verticesCircle;
+    delete[] random_colors;
 
     glfwTerminate();
     return 0;
