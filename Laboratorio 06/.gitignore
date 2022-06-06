@@ -3,3 +3,4 @@ include/
 lib/
 glad.c
 stb_image.h
+*.exe
