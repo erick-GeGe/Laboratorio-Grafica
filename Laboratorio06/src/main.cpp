@@ -72,7 +72,7 @@ int main()
 
 
     // load and create textures
-    unsigned int textureBackground[5], textureGithub;
+    unsigned int textureBackground[5];
     int width, height, nrChannels;
     stbi_set_flip_vertically_on_load(true); 
     for (size_t i = 0; i < 5; i++)
@@ -100,7 +100,9 @@ int main()
         stbi_image_free(data);
     }
 
+
     // texture Github
+    unsigned int textureGithub;
     glGenTextures(1, &textureGithub);
     glBindTexture(GL_TEXTURE_2D, textureGithub);
 
@@ -165,15 +167,12 @@ void processInput(GLFWwindow* window)
         glfwSetWindowShouldClose(window, true);
 
     if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-    {
         if (mixture < 1.0f)
-            mixture += 0.001f; // change this value accordingly (might be too slow or too fast based on system hardware)
-    }
+            mixture += 0.001f; 
     if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
-    {
         if (mixture > 0.0f)
-            mixture -= 0.001f; // change this value accordingly (might be too slow or too fast based on system hardware)
-    }
+            mixture -= 0.001f; 
+
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
         background = 0;
     if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
@@ -218,8 +217,7 @@ void generateCicle(int n, float*& vertices, float scale) {
 
         vertices[i * size_triangle + 8] = (v_cos + 1) / 2;
         vertices[i * size_triangle + 9] = (v_sin + 1) / 2;  
-        // std::cout << vertices[i * size_triangle] << ' ' << vertices[i * size_triangle + 1] << '\t' << vertices[i * size_triangle + 3] << ' ' << vertices[i * size_triangle + 4] << '\n';
-        // std::cout << vertices[i * size_triangle + 5] << ' ' << vertices[i * size_triangle + 6] << '\t' << vertices[i * size_triangle + 8] << ' ' << vertices[i * size_triangle + 9] << '\n';
+        
         vertices[i * size_triangle + 13] = 0.5;
         vertices[i * size_triangle + 14] = 0.5; 
     }
