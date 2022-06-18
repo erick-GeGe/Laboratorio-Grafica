@@ -86,7 +86,7 @@ int main()
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-        std::string src_texture = "resources/textures/wall0" + std::to_string(i+1) + ".jpg";
+        std::string src_texture = "../resources/textures/wall0" + std::to_string(i+1) + ".jpg";
         unsigned char *data = stbi_load(src_texture.c_str() , &width, &height, &nrChannels, 0);
         if (data)
         {
@@ -111,7 +111,7 @@ int main()
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    unsigned char *data = stbi_load("resources/textures/github.png", &width, &height, &nrChannels, 0);
+    unsigned char *data = stbi_load("../resources/textures/github.png", &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);

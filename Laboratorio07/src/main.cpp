@@ -87,7 +87,7 @@ int main()
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
 
-    std::string src_texture = "resources/textures/wall02.jpg";
+    std::string src_texture = "../resources/textures/wall02.jpg";
     unsigned char *data = stbi_load(src_texture.c_str() , &width, &height, &nrChannels, 0);
     if (data)
     {
@@ -111,7 +111,7 @@ int main()
     
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-    data = stbi_load("resources/textures/github.png", &width, &height, &nrChannels, 0);
+    data = stbi_load("../resources/textures/github.png", &width, &height, &nrChannels, 0);
     if (data)
     {
         glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
@@ -144,6 +144,7 @@ int main()
 
         // first transformation
         // ---------------------
+        
         glm::mat4 transform = glm::mat4(1.0f);
         transform = glm::scale(transform, glm::vec3(0.4f, 0.4f, 0.4f));
         transform = glm::translate(transform, glm::vec3(-1.25f, 1.25f, 0.0f));

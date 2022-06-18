@@ -1,7 +1,7 @@
 NAME_PROJECT = openGL
 
 SRC_DIR = src
-INCLUDES = -Iinclude
+INCLUDES = -I../dep/include
 LIBS = -lopengl32 -lglfw3 -lgdi32
 
 OBJS = $(SRC_DIR)\main.cpp $(SRC_DIR)\glad.c
