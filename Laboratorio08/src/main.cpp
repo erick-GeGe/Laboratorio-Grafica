@@ -187,14 +187,17 @@ int main()
     ourShader.setInt("texture1", 0);
     ourShader.setInt("texture2", 1);
 
-    glm::vec3 colors[3];
-    Cube cube(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), glm::mat4(1.0f), colors);
+    // glm::vec3 colors[3];
+    // Cube cube(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), glm::mat4(1.0f), colors);
 
+    glm::vec3 initialVector;
+
+
+    Cube cube(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), glm::mat4(1.0f));
     float angle = 0.f;
     float _PI = 3.14;
     float velocity = 0.25f;
-    glm::vec3 initialVector;
-    glm::mat4 initialRot = glm::mat4(1.f);
+    glm::mat4 initRotation = glm::mat4(1.f);
 
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -215,9 +218,10 @@ int main()
         // activate shader
         ourShader.use();
         // create transformations
-        glm::mat4 view = glm::mat4(1.0f); // make sure to initialize matrix to identity matrix first
         glm::mat4 projection = glm::mat4(1.0f);
         projection = glm::perspective(glm::radians(fov_value), (float)SCR_WIDTH / (float)SCR_HEIGHT, 0.1f, 100.0f);
+        
+        glm::mat4 view = glm::mat4(1.0f); 
         view = glm::translate(view, glm::vec3(viewx, viewy, viewz));
 
         if (rotating)
@@ -230,14 +234,14 @@ int main()
                 eje = glm::vec3(0, 1, 0);
             if (rotatingz)
                 eje = glm::vec3(0, 0, 1);
-            mat4 newRotation = rotate(glm::radians(angle), eje);
-            cube.Rotate = newRotation * initialRot;
+            glm::mat4 newRotation = rotate(glm::radians(angle), eje);
+            cube.Rotate = newRotation * initRotation;
 
             if (angle == 90.f)
             {
                 rotating = rotatingx = rotatingy = rotatingz = false;
                 angle = 0.f;
-                initialRot = cube.Rotate;
+                initRotation = cube.Rotate;
             }
         }
 
@@ -279,6 +283,7 @@ void processInput(GLFWwindow *window)
         viewy += 0.002f;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         viewx -= 0.002f;
+
     if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
         if (!rotating)
             rotating = rotatingx = true;
@@ -288,6 +293,8 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
         if (!rotating)
             rotating = rotatingz = true;
+
+
     if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
         if(fov_value < 150)
             fov_value += 0.02;

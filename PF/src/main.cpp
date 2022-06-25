@@ -1,5 +1,7 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <vector>
+
 #define STB_IMAGE_IMPLEMENTATION
 #include "stb_image.h"
 #include "shader.h"
@@ -10,6 +12,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <iostream>
+#include <cmath>
 
 void framebuffer_size_callback(GLFWwindow *window, int width, int height);
 void processInput(GLFWwindow *window);
@@ -20,8 +23,8 @@ const unsigned int SCR_HEIGHT = 600;
 
 float viewx, viewy = 0.f;
 float fov_value = 45.f;
-float viewz = -3.0f;
-float rotating, rotatingx, rotatingy, rotatingz = false;
+float viewz = -6.0f;
+bool rotating, rotating_u, rotating_i, rotating_o, rotating_j, rotating_k, rotating_l, rotating_y, rotating_h, rotating_p, rotating_coma, rotating_comilla, rotating_llave = false;
 
 int main()
 {
@@ -65,6 +68,56 @@ int main()
 
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
+    struct CubeData
+    {
+        glm::vec3 position_cube;
+        glm::mat4 rotation_cube;
+        int colors[3];
+    };
+
+    glm::mat4 rotation_aux = glm::mat4(1.f);
+    int num_cubes = 26;
+
+    vec3 colors[6] = {
+        vec3(1, 0, 0),     
+        vec3(0, 0, 1),     
+        vec3(0, 1, 0),     
+        vec3(0, 1, 1), 
+        vec3(1, 1, 0),     
+        vec3(1, 1, 1),     
+    };
+
+    CubeData cube_data[26] = {
+        {glm::vec3(-1, 1, 1), rotation_aux, {0, 1, 2}},
+        {glm::vec3(0, 1, 1), rotation_aux, {0, 1, 2}},
+        {glm::vec3(1, 1, 1), rotation_aux, {0, 1, 2}},
+        {glm::vec3(-1, 0, 1), rotation_aux, {0, 1, 2}},
+        {glm::vec3(0, 0, 1), rotation_aux, {0, 1, 2}},
+        {glm::vec3(1, 0, 1), rotation_aux, {0, 1, 2}},
+        {glm::vec3(-1, -1, 1), rotation_aux, {0, 1, 2}},
+        {glm::vec3(0, -1, 1), rotation_aux, {0, 1, 2}},
+        {glm::vec3(1, -1, 1), rotation_aux, {0, 1, 2}},
+
+        {glm::vec3(-1, 1, 0), rotation_aux, {0, 1, 2}},
+        {glm::vec3(0, 1, 0), rotation_aux, {0, 1, 2}},
+        {glm::vec3(1, 1, 0), rotation_aux, {0, 1, 2}},
+        {glm::vec3(-1, 0, 0), rotation_aux, {0, 1, 2}},
+        {glm::vec3(1, 0, 0), rotation_aux, {0, 1, 2}},
+        {glm::vec3(-1, -1, 0), rotation_aux, {0, 1, 2}},
+        {glm::vec3(0, -1, 0), rotation_aux, {0, 1, 2}},
+        {glm::vec3(1, -1, 0), rotation_aux, {0, 1, 2}},
+
+        {glm::vec3(-1, 1, -1), rotation_aux, {0, 1, 2}},
+        {glm::vec3(0, 1, -1), rotation_aux, {0, 1, 2}},
+        {glm::vec3(1, 1, -1), rotation_aux, {0, 1, 2}},
+        {glm::vec3(-1, 0, -1), rotation_aux, {0, 1, 2}},
+        {glm::vec3(0, 0, -1), rotation_aux, {0, 1, 2}},
+        {glm::vec3(1, 0, -1), rotation_aux, {0, 1, 2}},
+        {glm::vec3(-1, -1, -1), rotation_aux, {0, 1, 2}},
+        {glm::vec3(0, -1, -1), rotation_aux, {0, 1, 2}},
+        {glm::vec3(1, -1, -1), rotation_aux, {0, 1, 2}},
+    };
+
     float vertices[] = {
         -0.5f, -0.5f, -0.5f, 0.0f, 0.0f,
         0.5f, -0.5f, -0.5f, 1.0f, 0.0f,
@@ -130,7 +183,6 @@ int main()
     // -------------------------
     unsigned int texture1, texture2;
     {
-
         // texture 1
         // ---------
         glGenTextures(1, &texture1);
@@ -187,14 +239,23 @@ int main()
     ourShader.setInt("texture1", 0);
     ourShader.setInt("texture2", 1);
 
-    glm::vec3 colors[3];
-    Cube cube(glm::vec3(0, 0, 0), glm::vec3(1, 1, 1), glm::mat4(1.0f), colors);
+    glm::vec3 colors_face[3];
+    std::vector<Cube> cubes;
+    // Cube *cubes = new Cube[26];
+    for (size_t i = 0; i < num_cubes; i++)
+    {
+        for (size_t j = 0; j < 3; j++)
+            colors_face[j] = colors[cube_data[i].colors[j]];
+        
+        Cube cube(cube_data[i].position_cube, cube_data[i].rotation_cube, colors_face);
+        cubes.push_back(cube);
+    }
 
     float angle = 0.f;
     float _PI = 3.14;
-    float velocity = 0.25f;
-    glm::vec3 initialVector;
-    glm::mat4 initialRot = glm::mat4(1.f);
+    float velocity = 0.5f;
+    bool calculated = false;
+    std::vector<Cube *> cubes_rotation;
 
     // render loop
     while (!glfwWindowShouldClose(window))
@@ -222,26 +283,68 @@ int main()
 
         if (rotating)
         {
-            angle = fmin(angle + velocity, 90.f);
+            if (!calculated)
+            {
+                cubes_rotation.clear();
+                for (size_t i = 0; i < num_cubes; i++)
+                {
+                    if (rotating_y || rotating_h)
+                        if (cubes[i].init_pos.x < -0.9)
+                            cubes_rotation.push_back(&cubes[i]);
+
+                    if (rotating_comilla || rotating_llave)
+                        if (cubes[i].init_pos.x > 0.9)
+                            cubes_rotation.push_back(&cubes[i]);
+
+                    if (rotating_i || rotating_k)
+                        if (cubes[i].init_pos.y > 0.9)
+                            cubes_rotation.push_back(&cubes[i]);
+                    if (rotating_o || rotating_l)
+                        if (cubes[i].init_pos.y < -0.9)
+                            cubes_rotation.push_back(&cubes[i]);
+
+                    if (rotating_p || rotating_coma)
+                        if (cubes[i].init_pos.z > 0.9)
+                            cubes_rotation.push_back(&cubes[i]);
+                    if (rotating_u || rotating_j)
+                        if (cubes[i].init_pos.z < -0.9)
+                            cubes_rotation.push_back(&cubes[i]);
+                }
+            }
+
             glm::vec3 eje = glm::vec3(0, 0, 0);
-            if (rotatingx)
+            if (rotating_y || rotating_llave)
                 eje = glm::vec3(1, 0, 0);
-            if (rotatingy)
+            if (rotating_h || rotating_comilla)
+                eje = glm::vec3(-1, 0, 0);
+            if (rotating_i || rotating_o)
                 eje = glm::vec3(0, 1, 0);
-            if (rotatingz)
+            if (rotating_k || rotating_l)
+                eje = glm::vec3(0, -1, 0);
+            if (rotating_u || rotating_p)
                 eje = glm::vec3(0, 0, 1);
+            if (rotating_j || rotating_coma)
+                eje = glm::vec3(0, 0, -1);
+
+            angle = fmin(angle + velocity, 90.f);
             mat4 newRotation = rotate(glm::radians(angle), eje);
-            cube.Rotate = newRotation * initialRot;
+            for (size_t i = 0; i < cubes_rotation.size(); i++)
+                cubes_rotation[i]->Rotate = newRotation * cubes_rotation[i]->init_rotate;
 
             if (angle == 90.f)
             {
-                rotating = rotatingx = rotatingy = rotatingz = false;
+                rotating = rotating_u = rotating_i = rotating_o = rotating_j = rotating_k = rotating_l = rotating_y = rotating_h = rotating_p = rotating_coma = rotating_llave = rotating_comilla = false;
                 angle = 0.f;
-                initialRot = cube.Rotate;
+                for (size_t i = 0; i < cubes_rotation.size(); i++)
+                {
+                    cubes_rotation[i]->Rotate = newRotation * cubes_rotation[i]->init_rotate;
+                    cubes_rotation[i]->init_pos = vec3(newRotation * vec4(cubes_rotation[i]->init_pos, 0));
+                    cubes_rotation[i]->init_rotate = cubes_rotation[i]->Rotate;
+                }
             }
         }
-
-        cube.Draw(&ourShader, projection, view, 36);
+        for (size_t i = 0; i < num_cubes; i++)
+            cubes[i].Draw(&ourShader, projection, view);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -279,20 +382,49 @@ void processInput(GLFWwindow *window)
         viewy += 0.002f;
     if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
         viewx -= 0.002f;
-    if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+
+    if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS)
         if (!rotating)
-            rotating = rotatingx = true;
-    if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+            rotating = rotating_llave = true;
+    if (glfwGetKey(window, GLFW_KEY_APOSTROPHE) == GLFW_PRESS)
         if (!rotating)
-            rotating = rotatingy = true;
-    if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+            rotating = rotating_comilla = true;
+    if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
         if (!rotating)
-            rotating = rotatingz = true;
+            rotating = rotating_y = true;
+    if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
+        if (!rotating)
+            rotating = rotating_h = true;
+    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
+        if (!rotating)
+            rotating = rotating_p = true;
+    if (glfwGetKey(window, GLFW_KEY_SEMICOLON) == GLFW_PRESS)
+        if (!rotating)
+            rotating = rotating_coma = true;
+    if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
+        if (!rotating)
+            rotating = rotating_u = true;
+    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+        if (!rotating)
+            rotating = rotating_i = true;
+    if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+        if (!rotating)
+            rotating = rotating_o = true;
+    if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
+        if (!rotating)
+            rotating = rotating_j = true;
+    if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
+        if (!rotating)
+            rotating = rotating_k = true;
+    if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
+        if (!rotating)
+            rotating = rotating_l = true;
+
     if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
-        if(fov_value < 150)
+        if (fov_value < 150)
             fov_value += 0.02;
     if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-        if(fov_value > 0.5)
+        if (fov_value > 0.5)
             fov_value -= 0.02;
 }
 
