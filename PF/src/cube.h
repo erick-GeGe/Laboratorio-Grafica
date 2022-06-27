@@ -19,7 +19,7 @@ public:
     vec3 init_pos;
     mat4 init_rotate;
     Cube(vec3, vec3[3], int[3], int);
-    void Draw(Shader *, mat4, mat4);
+    void Draw(Shader *);
 
 private:
     vec3 faces_colors[3];
@@ -43,18 +43,18 @@ Cube::Cube(vec3 newTranslate, vec3 _face_colors[3], int _faces[3], int _num_face
     init_rotate = glm::mat4(1.f);
 }
 
-void Cube::Draw(Shader *shader_program, mat4 Projection, mat4 View)
+void Cube::Draw(Shader *shader_program)
 {
 
     mat4 model = Rotate * glm::translate(Translate) ;
-    mat4 mvp = Projection * View * model;
-    shader_program->setMat4("MVP", mvp);
+    // mat4 mvp = Projection * View * model;
+    shader_program->setMat4("model", model);
     shader_program->setVec3("color", glm::vec3(0, 0, 0));
 
-    // Cube white
+    // Cube 
     glDrawArrays(GL_TRIANGLES, 0, 36);
     
-    // Cube faces of cube
+    // Cube faces
     for (size_t i = 0; i < num_faces; i++)
     {
         shader_program->setVec3("color", faces_colors[i]);

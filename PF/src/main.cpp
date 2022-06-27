@@ -89,18 +89,10 @@ int main()
     // ------------------------------------
     Shader ourShader("src/shaders/vertexShader.glsl", "src/shaders/fragmentShader.glsl");
 
-    glm::vec3 colors[6] = {
-        glm::vec3(0.73, 0.02, 0.02), // 0 Red
-        glm::vec3(0.85, 0.85, 0.85), // 1 White
-        glm::vec3(0.96, 0.46, 0.14), // 2 Orange
-        glm::vec3(0.02, 0.37, 0.68), // 3 Bkue
-        glm::vec3(0.29, 0.68, 0.02), // 4 Green
-        glm::vec3(0.89, 0.69, 0.03), // 5 Yellow
-    };
-
     // set up vertex data (and buffer(s)) and configure vertex attributes
     // ------------------------------------------------------------------
     float vertices[] = {
+        //Cube
         -0.5f, -0.5f, -0.5f,
          0.5f, -0.5f, -0.5f,
          0.5f,  0.5f, -0.5f,
@@ -198,6 +190,15 @@ int main()
     // glm::mat4 rotation_aux = rotate(glm::radians(90.f), vec3(0,0,-1));
     int num_cubes = 26;
 
+    glm::vec3 colors[6] = {
+        glm::vec3(0.73, 0.02, 0.02), // 0 Red
+        glm::vec3(0.85, 0.85, 0.85), // 1 White
+        glm::vec3(0.96, 0.46, 0.14), // 2 Orange
+        glm::vec3(0.02, 0.37, 0.68), // 3 Bkue
+        glm::vec3(0.29, 0.68, 0.02), // 4 Green
+        glm::vec3(0.89, 0.69, 0.03), // 5 Yellow
+    };
+
     CubeData cube_data[26] = {
         // FORWARD-0 RED-0
         // LEFT-3 BLUE-3
@@ -206,35 +207,35 @@ int main()
         // BOT-5 YELLOW-5
         // BACKWARD-1 WHITE-1
 
-        //  POSITION            COLORS      FACES   NUM_FACES
-        {glm::vec3(-1, 1, 1), {0, 4, 3}, {0, 4, 3}, 3},  // LEFT-TOP-FORWARD
-        {glm::vec3(0, 1, 1), {0, 4, 0}, {0, 4, 0}, 2},   // TOP-FORWARD
-        {glm::vec3(1, 1, 1), {0, 2, 4}, {0, 2, 4}, 3},   // RIGHT-TOP-FORWARD
-        {glm::vec3(-1, 0, 1), {0, 3, 0}, {0, 3, 0}, 2},  // LEFT-FORWARD
-        {glm::vec3(0, 0, 1), {0, 0, 0}, {0, 0, 0}, 1},   // FORWARD
-        {glm::vec3(1, 0, 1), {0, 2, 0}, {0, 2, 0}, 2},   // RIGHT-FORWARD
-        {glm::vec3(-1, -1, 1), {0, 3, 5}, {0, 3, 5}, 3}, // LEFT-BOT-FORWARD
-        {glm::vec3(0, -1, 1), {0, 5, 0}, {0, 5, 0}, 2},  // BOT-FORWARD
-        {glm::vec3(1, -1, 1), {0, 2, 5}, {0, 2, 5}, 3},  // RIGHT-BOT-FORWARD
+        //  POSITION            COLORS    FACES   NUM_FACES
+        {glm::vec3(-1,  1,  1), {0, 4, 3}, {0, 4, 3}, 3},    // LEFT-TOP-FORWARD
+        {glm::vec3( 0,  1,  1), {0, 4, 0}, {0, 4, 0}, 2},    // TOP-FORWARD
+        {glm::vec3( 1,  1,  1), {0, 2, 4}, {0, 2, 4}, 3},    // RIGHT-TOP-FORWARD
+        {glm::vec3(-1,  0,  1), {0, 3, 0}, {0, 3, 0}, 2},    // LEFT-FORWARD
+        {glm::vec3( 0,  0,  1), {0, 0, 0}, {0, 0, 0}, 1},    // FORWARD
+        {glm::vec3( 1,  0,  1), {0, 2, 0}, {0, 2, 0}, 2},    // RIGHT-FORWARD
+        {glm::vec3(-1, -1,  1), {0, 3, 5}, {0, 3, 5}, 3},    // LEFT-BOT-FORWARD
+        {glm::vec3( 0, -1,  1), {0, 5, 0}, {0, 5, 0}, 2},    // BOT-FORWARD
+        {glm::vec3( 1, -1,  1), {0, 2, 5}, {0, 2, 5}, 3},    // RIGHT-BOT-FORWARD
 
-        {glm::vec3(-1, 1, 0), {3, 4, 0}, {3, 4, 0}, 2},  // LEFT-TOP
-        {glm::vec3(0, 1, 0), {4, 0, 0}, {4, 0, 0}, 1},   // TOP
-        {glm::vec3(1, 1, 0), {2, 4, 0}, {2, 4, 0}, 2},   // RIGHT-TOP
-        {glm::vec3(-1, 0, 0), {3, 0, 0}, {3, 0, 0}, 1},  // LEFTz
-        {glm::vec3(1, 0, 0), {2, 0, 0}, {2, 0, 0}, 1},   // RIGHT
-        {glm::vec3(-1, -1, 0), {3, 5, 0}, {3, 5, 0}, 2}, // LEFT-BOT
-        {glm::vec3(0, -1, 0), {5, 0, 0}, {5, 0, 0}, 1},  // BOT
-        {glm::vec3(1, -1, 0), {2, 5, 0}, {2, 5, 0}, 2},  // RIGHT-BOT
+        {glm::vec3(-1,  1,  0), {3, 4, 0}, {3, 4, 0}, 2},    // LEFT-TOP
+        {glm::vec3( 0,  1,  0), {4, 0, 0}, {4, 0, 0}, 1},    // TOP
+        {glm::vec3( 1,  1,  0), {2, 4, 0}, {2, 4, 0}, 2},    // RIGHT-TOP
+        {glm::vec3(-1,  0,  0), {3, 0, 0}, {3, 0, 0}, 1},    // LEFT
+        {glm::vec3( 1,  0,  0), {2, 0, 0}, {2, 0, 0}, 1},    // RIGHT
+        {glm::vec3(-1, -1,  0), {3, 5, 0}, {3, 5, 0}, 2},    // LEFT-BOT
+        {glm::vec3( 0, -1,  0), {5, 0, 0}, {5, 0, 0}, 1},    // BOT
+        {glm::vec3( 1, -1,  0), {2, 5, 0}, {2, 5, 0}, 2},    // RIGHT-BOT
 
-        {glm::vec3(-1, 1, -1), {3, 4, 1}, {3, 4, 1}, 3},  // LEFT-TOP-BACKWARD
-        {glm::vec3(0, 1, -1), {4, 1, 0}, {4, 1, 0}, 2},   // TOP-BACKWARD
-        {glm::vec3(1, 1, -1), {2, 4, 1}, {2, 4, 1}, 3},   // RIGHT-TOP-BACKWARD
-        {glm::vec3(-1, 0, -1), {3, 1, 0}, {3, 1, 0}, 2},  // LEFT-BACKWARD
-        {glm::vec3(0, 0, -1), {1, 0, 0}, {1, 0, 0}, 1},   // BACKWARD
-        {glm::vec3(1, 0, -1), {2, 1, 0}, {2, 1, 0}, 2},   // RIGHT-BACKWARD
-        {glm::vec3(-1, -1, -1), {3, 5, 1}, {3, 5, 1}, 3}, // LEFT-BOT-BACKWARD
-        {glm::vec3(0, -1, -1), {5, 1, 0}, {5, 1, 0}, 2},  // BOT-BACKWARD
-        {glm::vec3(1, -1, -1), {2, 5, 1}, {2, 5, 1}, 3},  // RIGHT-BOT-BACKWARD
+        {glm::vec3(-1,  1, -1), {3, 4, 1}, {3, 4, 1}, 3},    // LEFT-TOP-BACKWARD
+        {glm::vec3( 0,  1, -1), {4, 1, 0}, {4, 1, 0}, 2},    // TOP-BACKWARD
+        {glm::vec3( 1,  1, -1), {2, 4, 1}, {2, 4, 1}, 3},    // RIGHT-TOP-BACKWARD
+        {glm::vec3(-1,  0, -1), {3, 1, 0}, {3, 1, 0}, 2},    // LEFT-BACKWARD
+        {glm::vec3( 0,  0, -1), {1, 0, 0}, {1, 0, 0}, 1},    // BACKWARD
+        {glm::vec3( 1,  0, -1), {2, 1, 0}, {2, 1, 0}, 2},    // RIGHT-BACKWARD
+        {glm::vec3(-1, -1, -1), {3, 5, 1}, {3, 5, 1}, 3},    // LEFT-BOT-BACKWARD
+        {glm::vec3( 0, -1, -1), {5, 1, 0}, {5, 1, 0}, 2},    // BOT-BACKWARD
+        {glm::vec3( 1, -1, -1), {2, 5, 1}, {2, 5, 1}, 3},    // RIGHT-BOT-BACKWARD
     };
 
     glm::vec3 colors_face[3];
@@ -325,7 +326,7 @@ int main()
         }
 
         for (size_t i = 0; i < num_cubes; i++)
-            cubes[i].Draw(&ourShader, projection, view);
+            cubes[i].Draw(&ourShader);
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------

@@ -1,6 +1,5 @@
 .vscode/
-include/
-lib/
 glad.c
 stb_image.h
+.gitignore
 *.exe
