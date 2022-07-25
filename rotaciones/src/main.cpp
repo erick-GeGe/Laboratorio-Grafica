@@ -1,8 +1,6 @@
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
 #include "cube.h"
 #include "shader.h"
 
@@ -45,7 +43,7 @@ float fov = 45.0f;
 float deltaTime = 0.0f; // time between current frame and last frame
 float lastFrame = 0.0f;
 
-bool rotating, rotating_u, rotating_i, rotating_o, rotating_j, rotating_k, rotating_l, rotating_y, rotating_h, rotating_p, rotating_coma, rotating_comilla, rotating_llave = false;
+bool rotating, rotate_x, rotate_y, rotate_z, rotate_x_, rotate_y_, rotate_z_ = false;
 
 int main()
 {
@@ -183,12 +181,11 @@ int main()
     struct CubeData
     {
         glm::vec3 position_cube;
-        int colors[3];
-        int faces[3];
+        int colors[5];
         int n_faces;
     };
     // glm::mat4 rotation_aux = rotate(glm::radians(90.f), vec3(0,0,-1));
-    int num_cubes = 26;
+    int num_cubes = 3;
 
     glm::vec3 colors[6] = {
         glm::vec3(0.73, 0.02, 0.02), // 0 Red
@@ -199,7 +196,7 @@ int main()
         glm::vec3(0.89, 0.69, 0.03), // 5 Yellow
     };
 
-    CubeData cube_data[26] = {
+    CubeData cube_data[3] = {
         // FORWARD-0 RED-0
         // LEFT-3 BLUE-3
         // TOP-4 GREEN-4
@@ -207,46 +204,21 @@ int main()
         // BOT-5 YELLOW-5
         // BACKWARD-1 WHITE-1
 
-        //  POSITION            COLORS    FACES   NUM_FACES
-        {glm::vec3(-1,  1,  1), {0, 4, 3}, {0, 4, 3}, 3},    // LEFT-TOP-FORWARD
-        {glm::vec3( 0,  1,  1), {0, 4, 0}, {0, 4, 0}, 2},    // TOP-FORWARD
-        {glm::vec3( 1,  1,  1), {0, 2, 4}, {0, 2, 4}, 3},    // RIGHT-TOP-FORWARD
-        {glm::vec3(-1,  0,  1), {0, 3, 0}, {0, 3, 0}, 2},    // LEFT-FORWARD
-        {glm::vec3( 0,  0,  1), {0, 0, 0}, {0, 0, 0}, 1},    // FORWARD
-        {glm::vec3( 1,  0,  1), {0, 2, 0}, {0, 2, 0}, 2},    // RIGHT-FORWARD
-        {glm::vec3(-1, -1,  1), {0, 3, 5}, {0, 3, 5}, 3},    // LEFT-BOT-FORWARD
-        {glm::vec3( 0, -1,  1), {0, 5, 0}, {0, 5, 0}, 2},    // BOT-FORWARD
-        {glm::vec3( 1, -1,  1), {0, 2, 5}, {0, 2, 5}, 3},    // RIGHT-BOT-FORWARD
-
-        {glm::vec3(-1,  1,  0), {3, 4, 0}, {3, 4, 0}, 2},    // LEFT-TOP
-        {glm::vec3( 0,  1,  0), {4, 0, 0}, {4, 0, 0}, 1},    // TOP
-        {glm::vec3( 1,  1,  0), {2, 4, 0}, {2, 4, 0}, 2},    // RIGHT-TOP
-        {glm::vec3(-1,  0,  0), {3, 0, 0}, {3, 0, 0}, 1},    // LEFT
-        {glm::vec3( 1,  0,  0), {2, 0, 0}, {2, 0, 0}, 1},    // RIGHT
-        {glm::vec3(-1, -1,  0), {3, 5, 0}, {3, 5, 0}, 2},    // LEFT-BOT
-        {glm::vec3( 0, -1,  0), {5, 0, 0}, {5, 0, 0}, 1},    // BOT
-        {glm::vec3( 1, -1,  0), {2, 5, 0}, {2, 5, 0}, 2},    // RIGHT-BOT
-
-        {glm::vec3(-1,  1, -1), {3, 4, 1}, {3, 4, 1}, 3},    // LEFT-TOP-BACKWARD
-        {glm::vec3( 0,  1, -1), {4, 1, 0}, {4, 1, 0}, 2},    // TOP-BACKWARD
-        {glm::vec3( 1,  1, -1), {2, 4, 1}, {2, 4, 1}, 3},    // RIGHT-TOP-BACKWARD
-        {glm::vec3(-1,  0, -1), {3, 1, 0}, {3, 1, 0}, 2},    // LEFT-BACKWARD
-        {glm::vec3( 0,  0, -1), {1, 0, 0}, {1, 0, 0}, 1},    // BACKWARD
-        {glm::vec3( 1,  0, -1), {2, 1, 0}, {2, 1, 0}, 2},    // RIGHT-BACKWARD
-        {glm::vec3(-1, -1, -1), {3, 5, 1}, {3, 5, 1}, 3},    // LEFT-BOT-BACKWARD
-        {glm::vec3( 0, -1, -1), {5, 1, 0}, {5, 1, 0}, 2},    // BOT-BACKWARD
-        {glm::vec3( 1, -1, -1), {2, 5, 1}, {2, 5, 1}, 3},    // RIGHT-BOT-BACKWARD
+        //  POSITION            COLORS       NUM_FACES
+        {glm::vec3( 0,  1, 0), {0, 1, 2, 3, 4}, 5},    // TOP
+        {glm::vec3( 0,  0, 0), {0, 1, 2, 3, 0}, 4},    // MID
+        {glm::vec3( 0, -1, 0), {0, 1, 2, 3, 5}, 5},    // BOT
+       
     };
 
-    glm::vec3 colors_face[3];
+    glm::vec3 colors_face[5];
     std::vector<Cube> cubes;
-    int faces[3] = {0, 0, 0};
     for (size_t i = 0; i < num_cubes; i++)
     {
-        for (size_t j = 0; j < 3; j++)
+        for (size_t j = 0; j < 5; j++)
             colors_face[j] = colors[cube_data[i].colors[j]];
 
-        cubes.push_back(Cube(cube_data[i].position_cube, colors_face, cube_data[i].faces, cube_data[i].n_faces));
+        cubes.push_back(Cube(cube_data[i].position_cube, colors_face, cube_data[i].colors, cube_data[i].n_faces));
     }
 
     unsigned int VBO, VAO;
@@ -269,7 +241,6 @@ int main()
     float velocity = 0.3f;
     bool calculated = false;
     glm::vec3 eje = glm::vec3(0,0,0);
-    std::vector<Cube *> cubes_rotation;
     // render loop
     // -----------
     while (!glfwWindowShouldClose(window))
@@ -306,34 +277,40 @@ int main()
 
             if (!calculated)
             {
-                getCubesToRotate(&cubes_rotation, cubes, num_cubes);
                 eje = getEjeToRotate();
                 calculated = true;
             }
 
             angle = fmin(angle + velocity, 90.f);
             mat4 newRotation = rotate(glm::radians(angle), eje);
-            for (size_t i = 0; i < cubes_rotation.size(); i++)
-                cubes_rotation[i]->Rotate = newRotation * cubes_rotation[i]->init_rotate;
+
+            // rotating cubes
+            for (size_t i = 0; i < cubes.size(); i++)
+            {
+                cubes[i].Translate = vec3(newRotation * vec4(cubes[i].real_pos, 0));
+                cubes[i].Rotate = newRotation* cubes[i].init_rotate;
+            }
 
             if (angle == 90.f)
             {
-                rotating = rotating_u = rotating_i = rotating_o = rotating_j = rotating_k = rotating_l = rotating_y = rotating_h = rotating_p = rotating_coma = rotating_llave = rotating_comilla = false;
+                // reset variables
+                rotating = rotate_x = rotate_y = rotate_z = rotate_x_ = rotate_y_ = rotate_z_ = false;
                 calculated = false;
                 angle = 0.f;
-                for (size_t i = 0; i < cubes_rotation.size(); i++)
+
+                // update cube pos and rotate 
+                for (size_t i = 0; i < cubes.size(); i++)
                 {
-                    // cubes_rotation[i]->Rotate = newRotation * cubes_rotation[i]->init_rotate;
-                    cubes_rotation[i]->real_pos = vec3(newRotation * vec4(cubes_rotation[i]->real_pos, 0));
-                    cubes_rotation[i]->init_rotate = cubes_rotation[i]->Rotate;
+                    cubes[i].real_pos = cubes[i].Translate;
+                    cubes[i].init_rotate = cubes[i].Rotate;
                 }
             }
         }
 
+
         for (size_t i = 0; i < num_cubes; i++)
             cubes[i].Draw(&ourShader);
 
-        
 
         // glfw: swap buffers and poll IO events (keys pressed/released, mouse moved etc.)
         // -------------------------------------------------------------------------------
@@ -352,51 +329,21 @@ int main()
     return 0;
 }
 
-// process all input: query GLFW whether relevant keys are pressed/released this frame and react accordingly
-// ---------------------------------------------------------------------------------------------------------
-void getCubesToRotate(std::vector<Cube *> *cubes_to_rotate, std::vector<Cube> &cubes, int num_cubes)
-{
-    cubes_to_rotate->clear();
-    for (size_t i = 0; i < num_cubes; i++)
-    {
-        if (rotating_y || rotating_h)
-            if (cubes[i].real_pos.x < -0.9)
-                cubes_to_rotate->push_back(&cubes[i]);
-
-        if (rotating_comilla || rotating_llave)
-            if (cubes[i].real_pos.x > 0.9)
-                cubes_to_rotate->push_back(&cubes[i]);
-
-        if (rotating_i || rotating_k)
-            if (cubes[i].real_pos.y > 0.9)
-                cubes_to_rotate->push_back(&cubes[i]);
-        if (rotating_o || rotating_l)
-            if (cubes[i].real_pos.y < -0.9)
-                cubes_to_rotate->push_back(&cubes[i]);
-
-        if (rotating_p || rotating_coma)
-            if (cubes[i].real_pos.z > 0.9)
-                cubes_to_rotate->push_back(&cubes[i]);
-        if (rotating_u || rotating_j)
-            if (cubes[i].real_pos.z < -0.9)
-                cubes_to_rotate->push_back(&cubes[i]);
-    }
-}
 
 vec3 getEjeToRotate()
 {
     glm::vec3 eje = glm::vec3(0, 0, 0);
-    if (rotating_y || rotating_llave)
+    if (rotate_x)
         eje = glm::vec3(1, 0, 0);
-    if (rotating_h || rotating_comilla)
+    if (rotate_x_)
         eje = glm::vec3(-1, 0, 0);
-    if (rotating_i || rotating_o)
+    if (rotate_y)
         eje = glm::vec3(0, 1, 0);
-    if (rotating_k || rotating_l)
+    if (rotate_y_)
         eje = glm::vec3(0, -1, 0);
-    if (rotating_u || rotating_p)
+    if (rotate_z)
         eje = glm::vec3(0, 0, 1);
-    if (rotating_j || rotating_coma)
+    if (rotate_z_)
         eje = glm::vec3(0, 0, -1);
     return eje;
 }
@@ -420,42 +367,27 @@ void processInput(GLFWwindow *window)
     if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
         cameraPos -= cameraUp * cameraSpeed;
 
-    if (glfwGetKey(window, GLFW_KEY_LEFT_BRACKET) == GLFW_PRESS)
-        if (!rotating)
-            rotating = rotating_llave = true;
-    if (glfwGetKey(window, GLFW_KEY_APOSTROPHE) == GLFW_PRESS)
-        if (!rotating)
-            rotating = rotating_comilla = true;
-    if (glfwGetKey(window, GLFW_KEY_Y) == GLFW_PRESS)
-        if (!rotating)
-            rotating = rotating_y = true;
-    if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS)
-        if (!rotating)
-            rotating = rotating_h = true;
-    if (glfwGetKey(window, GLFW_KEY_P) == GLFW_PRESS)
-        if (!rotating)
-            rotating = rotating_p = true;
-    if (glfwGetKey(window, GLFW_KEY_SEMICOLON) == GLFW_PRESS)
-        if (!rotating)
-            rotating = rotating_coma = true;
+
+    // Input to rotate
+    
     if (glfwGetKey(window, GLFW_KEY_U) == GLFW_PRESS)
         if (!rotating)
-            rotating = rotating_u = true;
-    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
-        if (!rotating)
-            rotating = rotating_i = true;
-    if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
-        if (!rotating)
-            rotating = rotating_o = true;
+            rotating = rotate_x = true;
     if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS)
         if (!rotating)
-            rotating = rotating_j = true;
+            rotating = rotate_x_ = true;
+    if (glfwGetKey(window, GLFW_KEY_I) == GLFW_PRESS)
+        if (!rotating)
+            rotating = rotate_y = true;
     if (glfwGetKey(window, GLFW_KEY_K) == GLFW_PRESS)
         if (!rotating)
-            rotating = rotating_k = true;
+            rotating = rotate_y_ = true;
+    if (glfwGetKey(window, GLFW_KEY_O) == GLFW_PRESS)
+        if (!rotating)
+            rotating = rotate_z = true;
     if (glfwGetKey(window, GLFW_KEY_L) == GLFW_PRESS)
         if (!rotating)
-            rotating = rotating_l = true;
+            rotating = rotate_z_ = true;
 }
 
 // glfw: whenever the window size changed (by OS or user resize) this callback function executes

@@ -18,15 +18,15 @@ public:
     mat4 Rotate;
     vec3 real_pos;
     mat4 init_rotate;
-    Cube(vec3, vec3[3], int[3], int);
+    Cube(vec3, vec3[5], int[5], int);
     void Draw(Shader *);
 
 private:
-    vec3 faces_colors[3];
-    int faces[3];
+    vec3 faces_colors[5];
+    int faces[5];
 };
 
-Cube::Cube(vec3 newTranslate, vec3 _face_colors[3], int _faces[3], int _num_faces)
+Cube::Cube(vec3 newTranslate, vec3 _face_colors[], int _faces[], int _num_faces)
 {
     Translate = newTranslate;
     Rotate = mat4(1.f);
@@ -45,8 +45,11 @@ Cube::Cube(vec3 newTranslate, vec3 _face_colors[3], int _faces[3], int _num_face
 
 void Cube::Draw(Shader *shader_program)
 {
+    // glm::mat4 model = glm::mat4(1.0f);
+    // model = glm::translate(model, Translate);
+    // model = glm::rotate(model, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
 
-    mat4 model = Rotate * glm::translate(Translate) ;
+    mat4 model = glm::translate(Translate) * Rotate;
     // mat4 mvp = Projection * View * model;
     shader_program->setMat4("model", model);
 
@@ -63,4 +66,17 @@ void Cube::Draw(Shader *shader_program)
         // glDrawArrays(GL_TRIANGLES, 36 + faces[i]*6, 6);
         glDrawArrays(GL_TRIANGLES, 36 + faces[i]*6, 6);
     }
+
+    // glm::mat4 trans = glm::mat4(1.0f);
+    // trans = glm::translate(trans, glm::vec3(0.5f, -0.5f, 0.0f));
+    // trans = glm::rotate(trans, (float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+
+
+    // glm::mat4 matriz = glm::mat4(1.0f);
+    // glm::vec3 posicion = vec3(0.5f, -0.5f, 0.0f);
+    // matriz = matriz * glm::translate(posicion);
+    // glm::mat4 rotacion = rotate((float)glfwGetTime(), glm::vec3(0.0f, 0.0f, 1.0f));
+    // matriz = matriz * rotacion;
+
+    // matriz = matriz * glm::translate(posicion) * rotacion;
 }
